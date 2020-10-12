@@ -1,5 +1,5 @@
 // require first
-const cp = requrie('child_process');
+const cp = require('child_process');
 const Server = require('node-git-server');
 const recursive = require('recursive-readdir');
 const Bottleneck = require('bottleneck');
@@ -20,6 +20,10 @@ class HostModule extends Module {
   constructor() {
     // run super
     super();
+
+    // bind methods
+    this.start = this.start.bind(this);
+    this.storage = this.storage.bind(this);
 
     // create limiter
     this.limiter = new Bottleneck({
