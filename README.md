@@ -15,8 +15,18 @@ This host connector adds hosts functionality to Dashup hosts:
 
 ```json
 {
-  "url" : "https://dashup.io",
-  "key" : "[dashup module key here]"
+  "url" : "https://dashup.io", 
+  "key" : "[dashup module key here]",
+
+  "dir"  : "[git folder here]",
+  "git"  : "[git domain here]",
+  "host" : "[host domain here]",
+  "port" : 14371,
+  
+  "bucket" : "[google bucket name]",
+  "google" : {
+    [google auth key JSON]
+  }
 }
 ```
 
