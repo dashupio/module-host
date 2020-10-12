@@ -25,7 +25,7 @@ This host connector adds hosts functionality to Dashup hosts:
   
   "bucket" : "[google bucket name]",
   "google" : {
-    [google auth key JSON]
+    // [google auth key JSON]
   }
 }
 ```
