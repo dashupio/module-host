@@ -1,0 +1,67 @@
+<page-host-config>
+  <div>
+    <div if={ state.repo } class="mb-3">
+      <label class="form-label">
+        Git Repo
+      </label>
+      <div class="mb-3">
+        <input class="form-control" readonly="true" name="repo" value={ `https://${state.git}/${props.page.get('_id')}.git` } />
+      </div>
+    </div>
+    <div if={ state.host } class="mb-3">
+      <label class="form-label">
+        Host Domain
+      </label>
+      <input class="form-control" readonly="true" name="key" value={ `https://${props.page.get('_id')}.${state.host}` } />
+    </div>
+
+    <div class="form-group m-0">
+      <label for="dist">
+        Distribution Folder
+      </label>
+      <input class="form-control" name="dist" id="dist" onchange={ (e) => onDist(e) } type="text" value={ props.page.get('data.dist') || '' } />
+    </div>
+  </div>
+
+  <script>
+    // export default
+    export default class DashupConfigHost {
+
+      /**
+       * on mounted
+       */
+      onMounted(...args) {
+        // check frontend
+        if (typeof window === 'undefined') return;
+
+        // init
+        this.init();
+      }
+
+      /**
+       * on color
+       */
+      onDist(e) {
+        // set color
+        this.props.data('dist', e.target.value);
+      }
+
+      /**
+       * init
+       */
+      async init() {
+        // loading
+        this.loading('repo', true);
+
+        // call key
+        const opts = await this.props.page.action('host', this.props.page.get('_id'));
+
+        // update key
+        this.update(opts);
+
+        // loading
+        this.loading('repo', false);
+      }
+    }
+  </script>
+</page-host-config>
