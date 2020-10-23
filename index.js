@@ -1,5 +1,6 @@
 // require first
 const cp = require('child_process');
+const fs = require('fs-extra');
 const Server = require('node-git-server');
 const recursive = require('recursive-readdir');
 const Bottleneck = require('bottleneck');
@@ -24,6 +25,9 @@ class HostModule extends Module {
     // bind methods
     this.start = this.start.bind(this);
     this.storage = this.storage.bind(this);
+
+    // bind
+    this.pushAction = this.pushAction.bind(this);
 
     // create limiter
     this.limiter = new Bottleneck({
@@ -86,7 +90,7 @@ class HostModule extends Module {
           // run user
           user(async (email, key) => {
             // repo
-            const actualKey = await this.dashup.connection.rpc({
+            const actualKey = await this.connection.rpc({
               type   : 'page',
               page   : repo.replace('.git', ''),
               struct : 'host',
@@ -102,7 +106,7 @@ class HostModule extends Module {
             next();
           });
         } else {
-          next();
+          next('Invalid type');
         }
       }
     });
@@ -153,11 +157,11 @@ class HostModule extends Module {
     push.repo = push.repo.replace('.git', '');
 
     // get repo
-    const page = await new Query(this.dashup, 'page', {
+    const page = await new Query({
       type   : 'page',
-      page   : repo.replace('.git', ''),
+      page   : push.repo,
       struct : 'host',
-    }).findById(push.repo);
+    }, this, 'page').findById(push.repo);
 
     // exec clone
     await fs.ensureDir(`${this.config.dir}/${push.repo}`);
@@ -206,7 +210,7 @@ class HostModule extends Module {
     await Promise.all(files.map((file) => this.limiter.schedule(async () => {
       // Create upload
       await this.store
-        .bucket(this.bucket)
+        .bucket(this.config.bucket)
         .upload(file, {
           gzip        : true,
           destination : `${remote}${file.replace(local, '')}`,

@@ -94,8 +94,8 @@ export default class HostPage extends Struct {
     // return info
     return {
       key,
-      git  : this.config.git,
-      host : this.config.host,
+      git  : this.dashup.config.git,
+      host : this.dashup.config.host,
     };
   }
 }

@@ -19,6 +19,7 @@
     "@google-cloud/storage": "^5.3.0",
     "babel-plugin-add-module-exports": "^1.0.4",
     "bottleneck": "^2.19.5",
+    "fs-extra": "^9.0.1",
     "node-git-server": "^0.6.1",
     "recursive-readdir": "^2.2.2"
   }
