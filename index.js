@@ -161,7 +161,7 @@ class HostModule extends Module {
       type   : 'page',
       page   : push.repo,
       struct : 'host',
-    }, this, 'page').findById(push.repo);
+    }, 'page').findById(push.repo);
 
     // exec clone
     await fs.ensureDir(`${this.config.dir}/${push.repo}`);
