@@ -1,6 +1,8 @@
 // require first
 const cp = require('child_process');
 const fs = require('fs-extra');
+const uuid = require('uuid').v4;
+const fetch = require('node-fetch');
 const Server = require('node-git-server');
 const recursive = require('recursive-readdir');
 const Bottleneck = require('bottleneck');
@@ -23,7 +25,9 @@ class HostModule extends Module {
     super();
 
     // bind methods
+    this.push = this.push.bind(this);
     this.start = this.start.bind(this);
+    this.fetch = this.fetch.bind(this);
     this.storage = this.storage.bind(this);
 
     // bind
@@ -145,6 +149,67 @@ class HostModule extends Module {
   }
 
   /**
+   * get meta
+   *
+   * @param {*} id 
+   */
+  async push(page, remote, data) {
+    // storage
+    await this.storage();
+
+    // create backup
+    try {
+      // move old file
+      await this.store
+        .bucket(this.config.bucket)
+        .file(`host/${page}/${remote}`)
+        .delete();
+    } catch (e) {}
+
+    // create temp file
+    const tmp = `${uuid()}.${remote.split('.').pop()}`;
+
+    // write file
+    await fs.writeFile(tmp, data);
+
+    // Create upload
+    await this.store
+      .bucket(this.config.bucket)
+      .upload(tmp, {
+        gzip        : true,
+        destination : `host/${page}/${remote}`,
+      });
+
+    // remove tmp
+    await fs.remove(tmp);
+    
+    // return true
+    return true;
+  }
+
+  /**
+   * get meta
+   *
+   * @param {*} id 
+   */
+  async fetch(page, remote, type = 'json') {
+    // remote
+    const base = `https://storage.googleapis.com/gcdn.dashup.io/host/${page}`;
+
+    // try/catch
+    try {
+      // res
+      const res = await fetch(`${base}/${remote}?version=${new Date().getTime()}`);
+
+      // result
+      return await res[type]();
+    } catch (e) {}
+
+    // return null
+    return null;
+  }
+
+  /**
    * push all files to b2
    *
    * @param push 
@@ -194,6 +259,9 @@ class HostModule extends Module {
     const local = `${this.config.dir}/${push.repo}${path}`;
     const remote = `git/${push.repo}`;
 
+    // backup
+    const bkp = (new Date()).getTime();
+
     // push all files to b2
     const files = await new Promise((resolve, reject) => {
       // read recursively
@@ -208,12 +276,26 @@ class HostModule extends Module {
 
     // create push
     await Promise.all(files.map((file) => this.limiter.schedule(async () => {
+      // create backup
+      try {
+        // move old file
+        await this.store
+          .bucket(this.config.bucket)
+          .file(`${remote}${file.replace(local, '')}`)
+          .move(`bkp/${push.repo}/${bkp}/${file.replace(local, '')}`);
+      } catch (e) {}
+
       // Create upload
       await this.store
         .bucket(this.config.bucket)
         .upload(file, {
           gzip        : true,
           destination : `${remote}${file.replace(local, '')}`,
+
+          // object you are uploading to a bucket.
+          metadata : {
+            cacheControl : 'public, max-age=31536000',
+          },
         });
     })));
 
