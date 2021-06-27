@@ -69,8 +69,7 @@ export default class HostPage extends Struct {
   get views() {
     // return object of views
     return {
-      view   : 'page/host/view',
-      menu   : 'page/host/menu',
+      view   : 'page/host',
       config : 'page/host/config',
     };
   }
