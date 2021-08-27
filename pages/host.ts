@@ -39,7 +39,7 @@ export default class HostPage extends Struct {
    */
   get icon() {
     // return page type label
-    return 'fa fa-upload';
+    return 'fad fa-upload text-primary';
   }
 
   /**
@@ -47,7 +47,7 @@ export default class HostPage extends Struct {
    */
   get title() {
     // return page type label
-    return 'Host Page';
+    return 'Hosting';
   }
 
   /**
@@ -87,7 +87,7 @@ export default class HostPage extends Struct {
    */
   get description() {
     // return description string
-    return 'Hosting API page';
+    return 'Configurable Hosting API';
   }
 
   /**
