@@ -1,5 +1,6 @@
 
 // import react
+import { TextField } from '@dashup/ui';
 import React, { useState, useEffect } from 'react';
 
 // global timer
@@ -24,6 +25,7 @@ const PageHostConfig = (props = {}) => {
   const [key, setKey] = useState(null);
   const [git, setGit] = useState(null);
   const [host, setHost] = useState(null);
+  const [distFolder, setDistFolder] = useState(props.page.get('data.dist') || '');
 
   // use effect
   useEffect(() => {
@@ -40,38 +42,45 @@ const PageHostConfig = (props = {}) => {
   return (
     <>
       { !!git && (
-        <div class="mb-3">
-          <label class="form-label">
-            Git Repo
-          </label>
-          <div class="mb-3">
-            <input class="form-control" readOnly value={ `https://${git}/${props.page.get('_id')}.git` } />
-          </div>
-        </div>
+        <TextField
+          label="Git Repo"
+          value={ `https://${git}/${props.page.get('_id')}.git` }
+          fullWidth
+
+          InputProps={ {
+            readOnly : true,
+          } }
+        />
       ) }
       { !!key && (
-        <div class="mb-3">
-          <label class="form-label">
-            Git Password
-          </label>
-          <input class="form-control" readOnly value={ key } />
-        </div>
+        <TextField
+          label="Git Password"
+          value={ key }
+          fullWidth
+
+          InputProps={ {
+            readOnly : true,
+          } }
+        />
       ) }
       { !!host && (
-        <div class="mb-3">
-          <label class="form-label">
-            Host Domain
-          </label>
-          <input class="form-control" readOnly value={ `https://${props.page.get('_id')}.${host}` } />
-        </div>
+        <TextField
+          label="Host Domain"
+          value={ `https://${props.page.get('_id')}.${host}` }
+          fullWidth
+
+          InputProps={ {
+            readOnly : true,
+          } }
+        />
       ) }
 
-      <div class="m-0">
-        <label for="dist" class="form-label">
-          Distribution Folder
-        </label>
-        <input class="form-control" onChange={ (e) => debounce(props.setData, 100)('dist', e.target.value) } type="text" defaultValue={ props.page.get('data.dist') || '' } />
-      </div>
+      <TextField
+        label="Host Domain"
+        value={ distFolder }
+        fullWidth
+        onChange={ (e) => !setDistFolder(e.target.value) && debounce(props.setData, 100)('dist', e.target.value) }
+      />
     </>
   );
 };
